@@ -266,7 +266,11 @@ func (r *bgpPathAttributeReader) Next() (*BGPPathAttribute, error) {
 		attr.Value = valueBytes
 	}
 
-	return attr, err
+	if err != nil {
+		attr.Value = valueBytes
+	}
+
+	return attr, nil
 }
 
 func decodeBGPMessage(data []byte, as4 bool, afi AFI) (*BGPMessage, error) {
