@@ -552,6 +552,12 @@ func (r *Reader) Next() (Record, error) {
 	hdrSubtype := binary.BigEndian.Uint16(hdrBytes[6:])
 	hdrLength := binary.BigEndian.Uint32(hdrBytes[8:])
 
+	data := make([]byte, len(hdrBytes)+int(hdrLength))
+	copy(data, hdrBytes)
+	if _, err := io.ReadFull(r.reader, data[len(hdrBytes):]); err != nil {
+		return nil, err
+	}
+
 	var record Record
 	switch hdrType {
 	case TYPE_OSPFv2:
@@ -595,12 +601,6 @@ func (r *Reader) Next() (Record, error) {
 		record = new(OSPFv3)
 	default:
 		return nil, fmt.Errorf("unknown MRT record type: %d", hdrType)
-	}
-
-	data := make([]byte, len(hdrBytes)+int(hdrLength))
-	copy(data, hdrBytes)
-	if _, err := io.ReadFull(r.reader, data[len(hdrBytes):]); err != nil {
-		return nil, err
 	}
 
 	if err := record.DecodeBytes(data); err != nil {
