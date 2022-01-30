@@ -243,7 +243,7 @@ func (r *bgpPathAttributeReader) Next() (*BGPPathAttribute, error) {
 	case 5:
 		attr.Value = binary.BigEndian.Uint32(valueBytes)
 	case 7:
-		attr.Value, err = decodeAggregatorAttr(valueBytes, r.as4)
+		attr.Value, err = decodeAggregatorAttr(valueBytes, len(valueBytes) == 8)
 	case 8:
 		attr.Value, err = decodeCommunitiesAttr(valueBytes)
 	case 9:
