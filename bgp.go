@@ -242,8 +242,6 @@ func (r *bgpPathAttributeReader) Next() (*BGPPathAttribute, error) {
 		attr.Value = binary.BigEndian.Uint32(valueBytes)
 	case 5:
 		attr.Value = binary.BigEndian.Uint32(valueBytes)
-	case 6:
-		// zero-length attribute
 	case 7:
 		attr.Value, err = decodeAggregatorAttr(valueBytes, r.as4)
 	case 8:
@@ -265,7 +263,7 @@ func (r *bgpPathAttributeReader) Next() (*BGPPathAttribute, error) {
 	case 32:
 		attr.Value, err = decodeLargeCommunitiesAttr(valueBytes)
 	default:
-		return nil, fmt.Errorf("unknown BGP path attribute type code: %d", attr.TypeCode)
+		attr.Value = valueBytes
 	}
 
 	return attr, err
