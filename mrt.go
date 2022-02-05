@@ -562,7 +562,13 @@ func NewReader(r io.Reader) *Reader {
 	}
 }
 
-func (r *Reader) Next() (Record, error) {
+func (r *Reader) Next() (record Record, err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			err = errors.New("parsing failed: " + fmt.Sprint(e))
+		}
+	}()
+
 	hdrBytes := make([]byte, 12)
 	if _, err := io.ReadFull(r.reader, hdrBytes); err != nil {
 		return nil, err
@@ -578,7 +584,6 @@ func (r *Reader) Next() (Record, error) {
 		return nil, err
 	}
 
-	var record Record
 	switch hdrType {
 	case TYPE_OSPFv2:
 		record = new(OSPFv2)
